@@ -1,6 +1,6 @@
 # The RTP Expression Language
 
-This is a super simple language for writing readable and memorizable text processing expressions.
+This is a crate contains a parser, execution engine and specification for a super simple language to write readable and memorizable text processing expressions.
 
 This document should be used as specification for language to clarify the development of this package.
 
