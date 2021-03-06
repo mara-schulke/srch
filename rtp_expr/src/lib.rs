@@ -1,3 +1,8 @@
+mod lexer;
+mod logical_operators;
+mod parser;
+mod queries;
+mod runtime;
 
 
 #[cfg(test)]
