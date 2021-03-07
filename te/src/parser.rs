@@ -137,7 +137,7 @@ pub fn parse(tokens: Vec<Token>) -> Result<AST> {
 
 #[cfg(test)]
 mod tests {
-	use super::{parse, Parser, AST, ASTNode};
+	use super::{parse, AST, ASTNode};
 	use crate::lexer::Token;
 	use crate::logical_operator::LogicalOperator;
 	use crate::query::Query;

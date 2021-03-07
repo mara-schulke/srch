@@ -37,8 +37,6 @@ pub fn run(ast: AST, input: &String) -> bool {
 mod tests {
 	use super::run;
 	use crate::into_ast;
-	use crate::logical_operator::LogicalOperator;
-	use crate::query::Query;
 
 	macro_rules! runtime_test {
 		($($name:ident: $value:expr,)*) => {
