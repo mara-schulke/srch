@@ -1,10 +1,10 @@
-# ter - Readable Text Proccessor
+# ter - Text Expression Runner
 
-`ter` is a small, well tested cli (and language), to easily execute basic text operations
-(filtering, ignore, replace) on the command line. There are many great tools that do this job.
-But most other tools have one in common: They are hard to memorize if you dont use them regularly.
-`ter` tries to solve this issue by providing a super simple cli & expression language which can
-be easily memorized and is well documented.
+`ter` is a cli to run text expressions and perform basic text operations such as filtering, ignoring
+and replacing on the command line. There are many great tools that do this job. But most other tools
+have one in common: They are hard to memorize if you dont use them regularly. `ter` tries to solve
+this issue by providing a super simple cli & expression language which can be easily memorized and
+is well documented.
 
 ## Quickstart
 
