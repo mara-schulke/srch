@@ -16,11 +16,3 @@ pub fn into_ast(source: String) -> RTPExpressionResult<parser::AST> {
 
 	Ok(ast)
 }
-
-#[cfg(test)]
-mod tests {
-	#[test]
-	fn it_works() {
-		assert_eq!(2 + 2, 4);
-	}
-}
