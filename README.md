@@ -79,8 +79,8 @@ Attributes can be concattenated by logical operators.
 ## Examples
 
 ```
-starts 'FOO' and ends 'BAR'
-contains '@' and contains '.com'
+starts "FOO" and ends "BAR"
+contains "@" and contains ".com"
 length 5 and length 10
 numeric and length 8
 ```
