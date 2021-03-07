@@ -7,7 +7,6 @@ edition = "2018"
 homepage = "https://github.com/schulke-214/ter/tree/main/te"
 repository = "https://github.com/schulke-214/ter.git"
 license = "MIT"
-license-file = "../LICENSE"
 readme = "README.md"
 keywords = ["text-processing", "language", "domain-specific-language"]
 
