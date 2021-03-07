@@ -1,8 +1,10 @@
 [package]
 name = "rtp"
 version = "0.1.0"
-authors = ["schulke-214 <hello@maximilianschulke.com>"]
+authors = ["Maximilian Schulke <hello@maximilianschulke.com>"]
+description = "A small & well tested tool and language to easily execute basic text operations such as filtering, ignoring or replacing words or lines"
 edition = "2018"
 
 [dependencies]
 rtp_expr = { path = "rtp_expr" }
+clap = "3.0.0-beta.2"
