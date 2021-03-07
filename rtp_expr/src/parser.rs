@@ -88,29 +88,39 @@ impl Parser {
 		if self.tokens.len() == 1 {
 			let query = Self::expect_query(self.tokens[0].clone())?;
 			return Ok(AST::Query(query));
-		}
+		} else if self.tokens.len() > 2 {
+			let next_operator = Self::expect_operator(self.tokens[1].clone())?;
 
-		else if self.tokens.len() > 2 {
+			if next_operator == LogicalOperator::And {
+				let mut tkns = self.tokens.clone();
+
+				if let Some(index) = tkns.iter().position(|tkn| tkn == &Token::LogicalOperator(LogicalOperator::Or)) {
+					let right_tokens = tkns.split_off(index)[1..].to_vec();
+
+					let left = Box::new(parse(tkns)?);
+					let right = Box::new(parse(right_tokens)?);
+
+					return Ok(ASTNode::BinaryExpression {
+						left,
+						operator: LogicalOperator::Or,
+						right
+					});
+				}
+			}
+
 			let left = Box::new(
 				AST::Query(
 					Self::expect_query(self.tokens[0].clone())?
 				)
 			);
-			let operator = Self::expect_operator(self.tokens[1].clone())?;
-			let right = {
-				let mut cloned_tokens = self.tokens.clone();
-
-				cloned_tokens.remove(0);
-				cloned_tokens.remove(0);
-
-				Box::new(parse(cloned_tokens)?)
-			};
-
+	
+			let right = Box::new(parse(self.tokens.clone()[2..].to_vec())?);
+	
 			return Ok(ASTNode::BinaryExpression {
 				left,
-				operator,
+				operator: next_operator,
 				right
-			})
+			});
 		}
 
 		Err(Error::InternalError)
@@ -132,29 +142,175 @@ mod tests {
 	use crate::logical_operator::LogicalOperator;
 	use crate::query::Query;
 
-	#[test]
-	fn it_parses_a_single_query() {
-		assert_eq!(
-			parse(vec![
-				Token::Query(Query::Numeric)
-			]).unwrap(),
-			AST::Query(Query::Numeric)
-		);
+	macro_rules! parser_tests {
+		($($name:ident: $value:expr,)*) => {
+			$(
+				#[test]
+				fn $name() {
+					let (tokens, expected_ast) = $value;
+					assert_eq!(parse(tokens).unwrap(), expected_ast);
+				}
+			)*
+		}
 	}
 
-	#[test]
-	fn it_parses_a_binary_query() {
-		assert_eq!(
-			parse(vec![
-				Token::Query(Query::Numeric),
-				Token::LogicalOperator(LogicalOperator::And),
-				Token::Query(Query::Length(1))
-			]).unwrap(),
-			AST::BinaryExpression {
-				left: Box::new(ASTNode::Query(Query::Numeric)),
-				operator: LogicalOperator::And,
-				right: Box::new(ASTNode::Query(Query::Length(1))),
-			}
-		);
+	mod it_parses_single_queries {
+		use super::*;
+
+		parser_tests! {
+			numeric: (
+				vec![
+					Token::Query(Query::Numeric)
+				],
+				AST::Query(Query::Numeric)
+			),
+		}
+	}
+
+	mod it_parses_binary_queries {
+		use super::*;
+
+		parser_tests! {
+			numeric_and_length: (
+				vec![
+					Token::Query(Query::Numeric),
+					Token::LogicalOperator(LogicalOperator::And),
+					Token::Query(Query::Length(1))
+				],
+				AST::BinaryExpression {
+					left: Box::new(ASTNode::Query(Query::Numeric)),
+					operator: LogicalOperator::And,
+					right: Box::new(ASTNode::Query(Query::Length(1))),
+				}
+			),
+			numeric_or_length: (
+				vec![
+					Token::Query(Query::Numeric),
+					Token::LogicalOperator(LogicalOperator::Or),
+					Token::Query(Query::Length(1))
+				],
+				AST::BinaryExpression {
+					left: Box::new(ASTNode::Query(Query::Numeric)),
+					operator: LogicalOperator::Or,
+					right: Box::new(ASTNode::Query(Query::Length(1))),
+				}
+			),
+		}
+	}
+
+	mod it_parses_composed_queries {
+		use super::*;
+
+		parser_tests! {
+			numeric_and_length_or_special: (
+				vec![
+					Token::Query(Query::Numeric),
+					Token::LogicalOperator(LogicalOperator::And),
+					Token::Query(Query::Length(1)),
+					Token::LogicalOperator(LogicalOperator::Or),
+					Token::Query(Query::Special),
+				],
+				AST::BinaryExpression {
+					left: Box::new(ASTNode::BinaryExpression {
+						left: Box::new(ASTNode::Query(Query::Numeric)),
+						operator: LogicalOperator::And,
+						right: Box::new(ASTNode::Query(Query::Length(1))),
+					}),
+					operator: LogicalOperator::Or,
+					right: Box::new(ASTNode::Query(Query::Special)),
+				}
+			),
+			numeric_or_length_and_special: (
+				vec![
+					Token::Query(Query::Numeric),
+					Token::LogicalOperator(LogicalOperator::Or),
+					Token::Query(Query::Length(1)),
+					Token::LogicalOperator(LogicalOperator::And),
+					Token::Query(Query::Special),
+				],
+				AST::BinaryExpression {
+					left: Box::new(ASTNode::Query(Query::Numeric)),
+					operator: LogicalOperator::Or,
+					right: Box::new(ASTNode::BinaryExpression {
+						left: Box::new(ASTNode::Query(Query::Length(1))),
+						operator: LogicalOperator::And,
+						right: Box::new(ASTNode::Query(Query::Special)),
+					}),
+				}
+			),
+			numeric_and_length_and_special: (
+				vec![
+					Token::Query(Query::Numeric),
+					Token::LogicalOperator(LogicalOperator::And),
+					Token::Query(Query::Length(1)),
+					Token::LogicalOperator(LogicalOperator::And),
+					Token::Query(Query::Special),
+				],
+				AST::BinaryExpression {
+					left: Box::new(ASTNode::Query(Query::Numeric)),
+					operator: LogicalOperator::And,
+					right: Box::new(ASTNode::BinaryExpression {
+						left: Box::new(ASTNode::Query(Query::Length(1))),
+						operator: LogicalOperator::And,
+						right: Box::new(ASTNode::Query(Query::Special)),
+					}),
+				}
+			),
+			numeric_or_length_or_special: (
+				vec![
+					Token::Query(Query::Numeric),
+					Token::LogicalOperator(LogicalOperator::Or),
+					Token::Query(Query::Length(1)),
+					Token::LogicalOperator(LogicalOperator::Or),
+					Token::Query(Query::Special),
+				],
+				AST::BinaryExpression {
+					left: Box::new(ASTNode::Query(Query::Numeric)),
+					operator: LogicalOperator::Or,
+					right: Box::new(ASTNode::BinaryExpression {
+						left: Box::new(ASTNode::Query(Query::Length(1))),
+						operator: LogicalOperator::Or,
+						right: Box::new(ASTNode::Query(Query::Special)),
+					}),
+				}
+			),
+		}
+	}
+
+	mod it_parses_complex_queries_and_preserves_operator_precedence {
+		use super::*;
+
+		parser_tests! {
+			numeric_or_alpha_or_alphanumeric_and_length_or_special: (
+				vec![
+					Token::Query(Query::Numeric),
+					Token::LogicalOperator(LogicalOperator::Or),
+					Token::Query(Query::Alpha),
+					Token::LogicalOperator(LogicalOperator::Or),
+					Token::Query(Query::Alphanumeric),
+					Token::LogicalOperator(LogicalOperator::And),
+					Token::Query(Query::Length(100)),
+					Token::LogicalOperator(LogicalOperator::Or),
+					Token::Query(Query::Special),
+				],
+				AST::BinaryExpression {
+					left: Box::new(ASTNode::Query(Query::Numeric)),
+					operator: LogicalOperator::Or,
+					right: Box::new(ASTNode::BinaryExpression {
+						left: Box::new(ASTNode::Query(Query::Alpha)),
+						operator: LogicalOperator::Or,
+						right: Box::new(ASTNode::BinaryExpression {
+							left: Box::new(ASTNode::BinaryExpression {
+								left: Box::new(ASTNode::Query(Query::Alphanumeric)),
+								operator: LogicalOperator::And,
+								right: Box::new(ASTNode::Query(Query::Length(100))),
+							}),
+							operator: LogicalOperator::Or,
+							right: Box::new(ASTNode::Query(Query::Special))
+						}),
+					}),
+				}
+			),
+		}
 	}
 }
