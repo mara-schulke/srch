@@ -99,12 +99,16 @@ impl<I: Iterator<Item = char> + Clone> Lexer<I> {
 	fn read_integer(&mut self) -> Result<Option<u64>> {
 		let mut int = String::new();
 
+		self.trim();
+
 		loop {
-			let x = self.peek();
+			let x = self.iter.peek();
 
 			match x {
 				Some(x) => {
-					if x == ' ' {
+					println!("{:#?}", *x);
+
+					if *x == ' ' {
 						break;
 					}
 
@@ -117,7 +121,7 @@ impl<I: Iterator<Item = char> + Clone> Lexer<I> {
 							return Err(Error::NoLeadingZeros);
 						},
 						_ => {
-							int.push(x);
+							int.push(*x);
 							self.iter.next();
 						}
 					}
@@ -169,13 +173,24 @@ impl<I: Iterator<Item = char> + Clone> Lexer<I> {
 	}
 
 	pub fn next(&mut self) -> Result<Option<Token>> {
-		match self.peek() {
-			Some(_) => {},
+		let c = match self.peek() {
+			Some(c) => c,
 			None => return Ok(None)
 		};
 
-		// Ok(None)
-		Ok(Some(Token::Query(self.expect_query().unwrap())))
+		let token = match c {
+			'&' => {
+				self.iter.next();
+				Token::LogicalOperator(Operator::And)
+			},
+			'|' => {
+				self.iter.next();
+				Token::LogicalOperator(Operator::Or)
+			},
+			_ => Token::Query(self.expect_query().unwrap())
+		};
+
+		Ok(Some(token))
 	}
 }
 
@@ -209,7 +224,7 @@ mod tests {
 		}
 	}
 	
-	mod parses_single_query {
+	mod it_parses_a_single_query {
 		use super::*;
 
 		lexer_tests! {
@@ -265,6 +280,195 @@ mod tests {
 				"special",
 				vec![
 					Token::Query(Query::Special)
+				]
+			),
+		}
+	}
+
+	mod it_parses_operators {
+		use super::*;
+
+		//todo: add more tests which handle invalid operators
+
+		lexer_tests! {
+			and: (
+				"&",
+				vec![
+					Token::LogicalOperator(Operator::And)
+				]
+			),
+			or: (
+				"|",
+				vec![
+					Token::LogicalOperator(Operator::Or)
+				]
+			),
+			and_and: (
+				"& &",
+				vec![
+					Token::LogicalOperator(Operator::And),
+					Token::LogicalOperator(Operator::And)
+				]
+			),
+			or_or: (
+				"| |",
+				vec![
+					Token::LogicalOperator(Operator::Or),
+					Token::LogicalOperator(Operator::Or)
+				]
+			),
+		}
+	}
+
+	mod it_parses_dual_expressions {
+		use super::*;
+
+		lexer_tests! {
+			starts_and_ends: (
+				"starts \"baz\" & ends \"bar\"",
+				vec![
+					Token::Query(Query::Starts("baz".to_string())),
+					Token::LogicalOperator(Operator::And),
+					Token::Query(Query::Ends("bar".to_string()))
+				]
+			),
+			starts_or_ends: (
+				"starts \"baz\" | ends \"bar\"",
+				vec![
+					Token::Query(Query::Starts("baz".to_string())),
+					Token::LogicalOperator(Operator::Or),
+					Token::Query(Query::Ends("bar".to_string()))
+				]
+			),
+			starts_and_contains: (
+				"starts \"baz\" & contains \"bar\"",
+				vec![
+					Token::Query(Query::Starts("baz".to_string())),
+					Token::LogicalOperator(Operator::And),
+					Token::Query(Query::Contains("bar".to_string()))
+				]
+			),
+			starts_or_contains: (
+				"starts \"baz\" | contains \"bar\"",
+				vec![
+					Token::Query(Query::Starts("baz".to_string())),
+					Token::LogicalOperator(Operator::Or),
+					Token::Query(Query::Contains("bar".to_string()))
+				]
+			),
+			starts_and_equals: (
+				"starts \"baz\" & equals \"bazbar\"",
+				vec![
+					Token::Query(Query::Starts("baz".to_string())),
+					Token::LogicalOperator(Operator::And),
+					Token::Query(Query::Equals("bazbar".to_string()))
+				]
+			),
+			starts_or_equals: (
+				"starts \"baz\" | equals \"bazbar\"",
+				vec![
+					Token::Query(Query::Starts("baz".to_string())),
+					Token::LogicalOperator(Operator::Or),
+					Token::Query(Query::Equals("bazbar".to_string()))
+				]
+			),
+			starts_and_length: (
+				"starts \"baz\" & length 10",
+				vec![
+					Token::Query(Query::Starts("baz".to_string())),
+					Token::LogicalOperator(Operator::And),
+					Token::Query(Query::Length(10))
+				]
+			),
+			starts_or_length: (
+				"starts \"baz\" | length 12130",
+				vec![
+					Token::Query(Query::Starts("baz".to_string())),
+					Token::LogicalOperator(Operator::Or),
+					Token::Query(Query::Length(12130))
+				]
+			),
+			starts_and_numeric: (
+				"starts \"baz\" & numeric",
+				vec![
+					Token::Query(Query::Starts("baz".to_string())),
+					Token::LogicalOperator(Operator::And),
+					Token::Query(Query::Numeric)
+				]
+			),
+			starts_or_numeric: (
+				"starts \"baz\" | numeric",
+				vec![
+					Token::Query(Query::Starts("baz".to_string())),
+					Token::LogicalOperator(Operator::Or),
+					Token::Query(Query::Numeric)
+				]
+			),
+			starts_and_alpha: (
+				"starts \"baz\" & alpha",
+				vec![
+					Token::Query(Query::Starts("baz".to_string())),
+					Token::LogicalOperator(Operator::And),
+					Token::Query(Query::Alpha)
+				]
+			),
+			starts_or_alpha: (
+				"starts \"baz\" | alpha",
+				vec![
+					Token::Query(Query::Starts("baz".to_string())),
+					Token::LogicalOperator(Operator::Or),
+					Token::Query(Query::Alpha)
+				]
+			),
+			starts_and_alphanumeric: (
+				"starts \"baz\" & alphanumeric",
+				vec![
+					Token::Query(Query::Starts("baz".to_string())),
+					Token::LogicalOperator(Operator::And),
+					Token::Query(Query::Alphanumeric)
+				]
+			),
+			starts_or_alphanumeric: (
+				"starts \"baz\" | alphanumeric",
+				vec![
+					Token::Query(Query::Starts("baz".to_string())),
+					Token::LogicalOperator(Operator::Or),
+					Token::Query(Query::Alphanumeric)
+				]
+			),
+			starts_and_special: (
+				"starts \"baz\" & special",
+				vec![
+					Token::Query(Query::Starts("baz".to_string())),
+					Token::LogicalOperator(Operator::And),
+					Token::Query(Query::Special)
+				]
+			),
+			starts_or_special: (
+				"starts \"baz\" | special",
+				vec![
+					Token::Query(Query::Starts("baz".to_string())),
+					Token::LogicalOperator(Operator::Or),
+					Token::Query(Query::Special)
+				]
+			),
+		}
+	}
+
+	mod it_parses_complex_expressions {
+		use super::*;
+
+		lexer_tests! {
+			starts_and_ends_or_length_or_special: (
+				"starts \"baz\" & ends \"bar\" | length 123 | special",
+				vec![
+					Token::Query(Query::Starts("baz".to_string())),
+					Token::LogicalOperator(Operator::And),
+					Token::Query(Query::Ends("bar".to_string())),
+					Token::LogicalOperator(Operator::Or),
+					Token::Query(Query::Length(123)),
+					Token::LogicalOperator(Operator::Or),
+					Token::Query(Query::Special),
 				]
 			),
 		}
