@@ -2,7 +2,7 @@
 name = "ter"
 version = "0.1.0"
 authors = ["Maximilian Schulke <hello@maximilianschulke.com>"]
-description = "A small & well tested tool and language to easily execute basic text operations such as filtering, ignoring or replacing words or lines"
+description = "A cli to run text expressions and perform basic text operations such as filtering, ignoring and replacing"
 edition = "2018"
 
 [dependencies]
