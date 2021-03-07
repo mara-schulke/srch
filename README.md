@@ -71,7 +71,7 @@ Currently there are only two binary logical operations: `and` and `or`
 
 | Operator | Boolean Algebra |
 |----------|-----------------|
-| `and     | Conjunction     |
+| `and`    | Conjunction     |
 | `or`     | Disjunction     |
 
 Attributes can be concattenated by logical operators.
