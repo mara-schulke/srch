@@ -108,7 +108,7 @@ impl<I: Iterator<Item = char> + Clone> Lexer<I> {
 				Some(x) => {
 					println!("{:#?}", *x);
 
-					if *x == ' ' {
+					if x.is_ascii_whitespace() {
 						break;
 					}
 
@@ -150,7 +150,7 @@ impl<I: Iterator<Item = char> + Clone> Lexer<I> {
 		let mut query_name = String::new();
 
 		while let Some(x) = self.iter.peek() {
-			if *x == ' ' {
+			if x.is_ascii_whitespace() {
 				break;
 			}
 
