@@ -36,28 +36,28 @@ Queries indicate the format of a string which gets tested against it. Currently 
 
 ## Logical Operators
 
-Currently there are only two binary logical operations: `&` and `|`
+Currently there are only two binary logical operations: `and` and `or`
 
 | Operator | Precedence | Associativity |
 |----------|------------|---------------|
-| `&`      | 2          | Right         |
-| `|`      | 1          | Right         |
+| `and`    | 2          | Right         |
+| `or`     | 1          | Right         |
 
 ### Examples
 
-`1 | 2` parses as `(1 | 2)`
+`1 or 2` parses as `(1 or 2)`
 
-`1 & 2` parses as `(1 & 2)`
+`1 and 2` parses as `(1 and 2)`
 
-`1 & 2 | 3` parses as `((1 & 2) | 3)`
+`1 and 2 or 3` parses as `((1 and 2) or 3)`
 
-`1 | 2 & 3` parses as `(1 | (2 & 3))`
+`1 or 2 and 3` parses as `(1 or (2 and 3))`
 
-`1 & 2 & 3` parses as `(1 & (2 & 3))`
+`1 and 2 and 3` parses as `(1 and (2 and 3))`
 
-`1 | 2 | 3` parses as `(1 | (2 | 3))`
+`1 or 2 or 3` parses as `(1 or (2 or 3))`
 
-`1 | 2 | 3 & 4 | 5` parses as `(1 | (2 | ((3 & 4) | 5)))))`
+`1 or 2 or 3 and 4 or 5` parses as `(1 or (2 or ((3 and 4) or 5)))))`
 
 ## Groups
 
