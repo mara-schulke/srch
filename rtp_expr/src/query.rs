@@ -46,8 +46,131 @@ impl Query {
 
 #[cfg(test)]
 mod tests {
-	#[test]
-	fn it_works() {
-		assert_eq!(2 + 2, 4);
+	use super::Query;
+
+	mod starts {
+		use super::*;
+		use pretty_assertions::assert_eq;
+
+		#[test]
+		fn starts_correctly() {
+			assert_eq!(
+				Query::Starts("foo".to_string()).exec("foobar".to_string()),
+				true
+			);
+		}
+
+		#[test]
+		fn starts_correctly_but_with_space() {
+			assert_eq!(
+				Query::Starts("foo".to_string()).exec(" foobar".to_string()),
+				false
+			);
+		}
+
+		#[test]
+		fn starts_incorrect() {
+			assert_eq!(
+				Query::Starts("foo".to_string()).exec("barfoo".to_string()),
+				false
+			);
+		}
+	}
+
+	mod ends {
+		use super::*;
+		use pretty_assertions::assert_eq;
+
+		#[test]
+		fn correctly() {
+			assert_eq!(
+				Query::Ends("baz".to_string()).exec("foobaz".to_string()),
+				true
+			);
+		}
+
+		#[test]
+		fn correctly_but_with_space() {
+			assert_eq!(
+				Query::Ends("baz".to_string()).exec("baz ".to_string()),
+				false
+			);
+		}
+
+		#[test]
+		fn incorrect() {
+			assert_eq!(
+				Query::Ends("baz".to_string()).exec("bazfoo".to_string()),
+				false
+			);
+		}
+	}
+
+	mod contains {
+		use super::*;
+		use pretty_assertions::assert_eq;
+
+		#[test]
+		fn at_start() {
+			assert_eq!(
+				Query::Contains("baz".to_string()).exec("bazfoo".to_string()),
+				true
+			);
+		}
+
+		#[test]
+		fn at_start_with_space() {
+			assert_eq!(
+				Query::Contains("baz".to_string()).exec(" bazfoo".to_string()),
+				true
+			);
+		}
+
+		#[test]
+		fn at_start_with_one_char_infront() {
+			assert_eq!(
+				Query::Contains("baz".to_string()).exec("Xbazfoo".to_string()),
+				true
+			);
+		}
+
+		#[test]
+		fn somewhere_in_string() {
+			assert_eq!(
+				Query::Contains("baz".to_string()).exec("ewfnorbaz2dewf1!".to_string()),
+				true
+			);
+		}
+
+		#[test]
+		fn at_end() {
+			assert_eq!(
+				Query::Contains("baz".to_string()).exec("foobaz".to_string()),
+				true
+			);
+		}
+
+		#[test]
+		fn at_end_with_space() {
+			assert_eq!(
+				Query::Contains("baz".to_string()).exec("bazfoo ".to_string()),
+				true
+			);
+		}
+
+		#[test]
+		fn at_end_with_one_char_behind() {
+			assert_eq!(
+				Query::Contains("baz".to_string()).exec("foobazX".to_string()),
+				true
+			);
+		}
+
+		fn does_not_contain() {
+			assert_eq!(
+				Query::Contains("baz".to_string()).exec("foobar".to_string()),
+				false
+			);
+		}
 	}
 }
