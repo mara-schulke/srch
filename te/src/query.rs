@@ -166,6 +166,7 @@ mod tests {
 			);
 		}
 
+		#[test]
 		fn does_not_contain() {
 			assert_eq!(
 				Query::Contains("baz".to_string()).exec(&"foobar".to_string()),
