@@ -11,6 +11,23 @@ pub enum Query {
 	Special
 }
 
+impl Query {
+
+	pub fn into_keyword(&self) -> &str {
+		match self {
+			Self::Starts(_) => "starts",
+			Self::Ends(_) => "ends",
+			Self::Contains(_) => "contains",
+			Self::Equals(_) => "equals",
+			Self::Length(_) => "length",
+			Self::Numeric => "numeric",
+			Self::Alpha => "alpha",
+			Self::Alphanumeric => "alphanumeric",
+			Self::Special => "special"
+		}
+	}
+}
+
 
 #[cfg(test)]
 mod tests {
