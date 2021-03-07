@@ -9,13 +9,10 @@ be easily memorized and is well documented.
 ## Quickstart
 
 ```
-rtp [operation] [mode] '<rtp-expression>' [flags] input output
-
-rtp filter 'starts "FOO" or contains "BLA"' --json ./.env
-rtp filter word 'equals "keyword"'
-
-rtp ignore word 'length 17'
-rtp replace 'equals "foo"' baz ./.env
+$ rtp filter 'equals "foobar"' -m word				# matches all occurences `foobar` in the text
+$ rtp filter 'length 20'							# matches all lines with 20 chars
+$ rtp ignore 'numeric or special'					# ignores all lines which contain only numbers and special chars
+$ rtp replace 'numeric and length 5' 12345 -m word	# replaces all 5 digit numbers with `12345`
 ```
 
 ## Common tasks where `rtp` excels `grep` in readability
@@ -33,7 +30,13 @@ rtp replace 'equals "foo"' baz ./.env
 
 As said earlier: `rtp` is no direct competitor to `grep`, `awk`, etc.! If you find yourself reaching the limits of the rtp expression language, you probably want to use more advanced tools. `rtp` 
 
+# Installing
 
+At the moment `rtp` can be installed only via `cargo` using:
+
+```
+$ cargo install rtp
+```
 
 # Documentation
 
@@ -59,7 +62,7 @@ If no file is provided `rtp` tries to read from stdin.
 ## Examples
 
 ```
-docker ps | rtp filter 'alphanumeric and length 12' -m word # prints all docker container ids
+$ docker ps | rtp filter 'alphanumeric and length 12' -m word # prints all docker container ids
 ```
 
 # The RTP Expression Language
