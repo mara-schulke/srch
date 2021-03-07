@@ -5,3 +5,4 @@ authors = ["schulke-214 <hello@maximilianschulke.com>"]
 edition = "2018"
 
 [dependencies]
+rtp_expr = { path = "rtp_expr" }
