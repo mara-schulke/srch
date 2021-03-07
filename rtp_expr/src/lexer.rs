@@ -10,13 +10,13 @@ type Result<T> = std::result::Result<T, Error>;
 pub enum Error {
 	UnknownSyntax,
 	InternalError,
-	TrailingOperator,
 	ToManyArguments,
 	NoLeadingZeros,
 	UnclosedString,
 	ExpectedString,
 	ExpectedInteger,
-	ExpectedQuery
+	ExpectedQuery,
+	ExpectedOperator
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -146,51 +146,59 @@ impl<I: Iterator<Item = char> + Clone> Lexer<I> {
 		}
 	}
 
-	fn expect_query(&mut self) -> Result<Query> {
-		let mut query_name = String::new();
+	fn expect_keyword(&mut self) -> Result<String> {
+		let mut keyword = String::new();
 
 		while let Some(x) = self.iter.peek() {
 			if x.is_ascii_whitespace() {
 				break;
 			}
 
-			query_name.push(*x);
+			keyword.push(*x);
 			self.iter.next();
 		}
 
-		match query_name.as_str() {
-			"starts" => Ok(Query::Starts(self.expect_string()?)),
-			"ends" => Ok(Query::Ends(self.expect_string()?)),
-			"contains" => Ok(Query::Contains(self.expect_string()?)),
-			"equals" => Ok(Query::Equals(self.expect_string()?)),
-			"length" => Ok(Query::Length(self.expect_integer()?)),
-			"numeric" => Ok(Query::Numeric),
-			"alpha" => Ok(Query::Alpha),
-			"alphanumeric" => Ok(Query::Alphanumeric),
-			"special" => Ok(Query::Special),
-			_ => Err(Error::ExpectedQuery)
+		Ok(keyword)
+	}
+
+	fn query_from_keyword(&mut self, keyword: &String) -> Result<Option<Query>> {
+		match keyword.as_str() {
+			"starts" => Ok(Some(Query::Starts(self.expect_string()?))),
+			"ends" => Ok(Some(Query::Ends(self.expect_string()?))),
+			"contains" => Ok(Some(Query::Contains(self.expect_string()?))),
+			"equals" => Ok(Some(Query::Equals(self.expect_string()?))),
+			"length" => Ok(Some(Query::Length(self.expect_integer()?))),
+			"numeric" => Ok(Some(Query::Numeric)),
+			"alpha" => Ok(Some(Query::Alpha)),
+			"alphanumeric" => Ok(Some(Query::Alphanumeric)),
+			"special" => Ok(Some(Query::Special)),
+			_ => Ok(None)
+		}
+	}
+
+	fn operator_from_keyword(&mut self, keyword: &String) -> Result<Option<LogicalOperator>> {
+		match keyword.as_str() {
+			"and" => Ok(Some(LogicalOperator::And)),
+			"or" => Ok(Some(LogicalOperator::Or)),
+			_ => Ok(None)
 		}
 	}
 
 	pub fn next(&mut self) -> Result<Option<Token>> {
-		let c = match self.peek() {
-			Some(c) => c,
+		match self.peek() {
+			Some(_) => {},
 			None => return Ok(None)
 		};
 
-		let token = match c {
-			'&' => {
-				self.iter.next();
-				Token::LogicalOperator(LogicalOperator::And)
-			},
-			'|' => {
-				self.iter.next();
-				Token::LogicalOperator(LogicalOperator::Or)
-			},
-			_ => Token::Query(self.expect_query().unwrap())
-		};
+		let keyword = self.expect_keyword()?;
 
-		Ok(Some(token))
+		if let Some(query) = self.query_from_keyword(&keyword)? {
+			return Ok(Some(Token::Query(query)));
+		} else if let Some(operator) = self.operator_from_keyword(&keyword)? {
+			return Ok(Some(Token::LogicalOperator(operator)));
+		}
+
+		Err(Error::InternalError)
 	}
 }
 
@@ -292,26 +300,26 @@ mod tests {
 
 		lexer_tests! {
 			and: (
-				"&",
+				"and",
 				vec![
 					Token::LogicalOperator(LogicalOperator::And)
 				]
 			),
 			or: (
-				"|",
+				"or",
 				vec![
 					Token::LogicalOperator(LogicalOperator::Or)
 				]
 			),
 			and_and: (
-				"& &",
+				"and and",
 				vec![
 					Token::LogicalOperator(LogicalOperator::And),
 					Token::LogicalOperator(LogicalOperator::And)
 				]
 			),
 			or_or: (
-				"| |",
+				"or or",
 				vec![
 					Token::LogicalOperator(LogicalOperator::Or),
 					Token::LogicalOperator(LogicalOperator::Or)
@@ -325,7 +333,7 @@ mod tests {
 
 		lexer_tests! {
 			starts_and_ends: (
-				"starts \"baz\" & ends \"bar\"",
+				"starts \"baz\" and ends \"bar\"",
 				vec![
 					Token::Query(Query::Starts("baz".to_string())),
 					Token::LogicalOperator(LogicalOperator::And),
@@ -333,7 +341,7 @@ mod tests {
 				]
 			),
 			starts_or_ends: (
-				"starts \"baz\" | ends \"bar\"",
+				"starts \"baz\" or ends \"bar\"",
 				vec![
 					Token::Query(Query::Starts("baz".to_string())),
 					Token::LogicalOperator(LogicalOperator::Or),
@@ -341,7 +349,7 @@ mod tests {
 				]
 			),
 			starts_and_contains: (
-				"starts \"baz\" & contains \"bar\"",
+				"starts \"baz\" and contains \"bar\"",
 				vec![
 					Token::Query(Query::Starts("baz".to_string())),
 					Token::LogicalOperator(LogicalOperator::And),
@@ -349,7 +357,7 @@ mod tests {
 				]
 			),
 			starts_or_contains: (
-				"starts \"baz\" | contains \"bar\"",
+				"starts \"baz\" or contains \"bar\"",
 				vec![
 					Token::Query(Query::Starts("baz".to_string())),
 					Token::LogicalOperator(LogicalOperator::Or),
@@ -357,7 +365,7 @@ mod tests {
 				]
 			),
 			starts_and_equals: (
-				"starts \"baz\" & equals \"bazbar\"",
+				"starts \"baz\" and equals \"bazbar\"",
 				vec![
 					Token::Query(Query::Starts("baz".to_string())),
 					Token::LogicalOperator(LogicalOperator::And),
@@ -365,7 +373,7 @@ mod tests {
 				]
 			),
 			starts_or_equals: (
-				"starts \"baz\" | equals \"bazbar\"",
+				"starts \"baz\" or equals \"bazbar\"",
 				vec![
 					Token::Query(Query::Starts("baz".to_string())),
 					Token::LogicalOperator(LogicalOperator::Or),
@@ -373,7 +381,7 @@ mod tests {
 				]
 			),
 			starts_and_length: (
-				"starts \"baz\" & length 10",
+				"starts \"baz\" and length 10",
 				vec![
 					Token::Query(Query::Starts("baz".to_string())),
 					Token::LogicalOperator(LogicalOperator::And),
@@ -381,7 +389,7 @@ mod tests {
 				]
 			),
 			starts_or_length: (
-				"starts \"baz\" | length 12130",
+				"starts \"baz\" or length 12130",
 				vec![
 					Token::Query(Query::Starts("baz".to_string())),
 					Token::LogicalOperator(LogicalOperator::Or),
@@ -389,7 +397,7 @@ mod tests {
 				]
 			),
 			starts_and_numeric: (
-				"starts \"baz\" & numeric",
+				"starts \"baz\" and numeric",
 				vec![
 					Token::Query(Query::Starts("baz".to_string())),
 					Token::LogicalOperator(LogicalOperator::And),
@@ -397,7 +405,7 @@ mod tests {
 				]
 			),
 			starts_or_numeric: (
-				"starts \"baz\" | numeric",
+				"starts \"baz\" or numeric",
 				vec![
 					Token::Query(Query::Starts("baz".to_string())),
 					Token::LogicalOperator(LogicalOperator::Or),
@@ -405,7 +413,7 @@ mod tests {
 				]
 			),
 			starts_and_alpha: (
-				"starts \"baz\" & alpha",
+				"starts \"baz\" and alpha",
 				vec![
 					Token::Query(Query::Starts("baz".to_string())),
 					Token::LogicalOperator(LogicalOperator::And),
@@ -413,7 +421,7 @@ mod tests {
 				]
 			),
 			starts_or_alpha: (
-				"starts \"baz\" | alpha",
+				"starts \"baz\" or alpha",
 				vec![
 					Token::Query(Query::Starts("baz".to_string())),
 					Token::LogicalOperator(LogicalOperator::Or),
@@ -421,7 +429,7 @@ mod tests {
 				]
 			),
 			starts_and_alphanumeric: (
-				"starts \"baz\" & alphanumeric",
+				"starts \"baz\" and alphanumeric",
 				vec![
 					Token::Query(Query::Starts("baz".to_string())),
 					Token::LogicalOperator(LogicalOperator::And),
@@ -429,7 +437,7 @@ mod tests {
 				]
 			),
 			starts_or_alphanumeric: (
-				"starts \"baz\" | alphanumeric",
+				"starts \"baz\" or alphanumeric",
 				vec![
 					Token::Query(Query::Starts("baz".to_string())),
 					Token::LogicalOperator(LogicalOperator::Or),
@@ -437,7 +445,7 @@ mod tests {
 				]
 			),
 			starts_and_special: (
-				"starts \"baz\" & special",
+				"starts \"baz\" and special",
 				vec![
 					Token::Query(Query::Starts("baz".to_string())),
 					Token::LogicalOperator(LogicalOperator::And),
@@ -445,7 +453,7 @@ mod tests {
 				]
 			),
 			starts_or_special: (
-				"starts \"baz\" | special",
+				"starts \"baz\" or special",
 				vec![
 					Token::Query(Query::Starts("baz".to_string())),
 					Token::LogicalOperator(LogicalOperator::Or),
@@ -460,7 +468,7 @@ mod tests {
 
 		lexer_tests! {
 			starts_and_ends_or_length_or_special: (
-				"starts \"baz\" & ends \"bar\" | length 123 | special",
+				"starts \"baz\" and ends \"bar\" or length 123 or special",
 				vec![
 					Token::Query(Query::Starts("baz".to_string())),
 					Token::LogicalOperator(LogicalOperator::And),
@@ -479,7 +487,7 @@ mod tests {
 
 		lexer_tests! {
 			begins_with_multiple_whitespaces: (
-				"    numeric | alpha",
+				"    numeric or alpha",
 				vec![
 					Token::Query(Query::Numeric),
 					Token::LogicalOperator(LogicalOperator::Or),
@@ -487,7 +495,7 @@ mod tests {
 				]
 			),
 			begins_with_multiple_whitespaces_and_query_with_string: (
-				"    starts \"foo\" | alpha",
+				"    starts \"foo\" or alpha",
 				vec![
 					Token::Query(Query::Starts("foo".to_string())),
 					Token::LogicalOperator(LogicalOperator::Or),
@@ -495,7 +503,7 @@ mod tests {
 				]
 			),
 			begins_with_multiple_whitespaces_and_query_with_integer: (
-				"    length 0 | alpha",
+				"    length 0 or alpha",
 				vec![
 					Token::Query(Query::Length(0)),
 					Token::LogicalOperator(LogicalOperator::Or),
@@ -503,7 +511,7 @@ mod tests {
 				]
 			),
 			ends_with_multiple_whitespaces: (
-				"numeric | alpha   ",
+				"numeric or alpha   ",
 				vec![
 					Token::Query(Query::Numeric),
 					Token::LogicalOperator(LogicalOperator::Or),
@@ -511,7 +519,7 @@ mod tests {
 				]
 			),
 			ends_with_multiple_whitespacess_and_query_with_string: (
-				"numeric | starts \"foo\"   ",
+				"numeric or starts \"foo\"   ",
 				vec![
 					Token::Query(Query::Numeric),
 					Token::LogicalOperator(LogicalOperator::Or),
@@ -519,7 +527,7 @@ mod tests {
 				]
 			),
 			ends_with_multiple_whitespacess_and_query_with_integer: (
-				"numeric | length 0   ",
+				"numeric or length 0   ",
 				vec![
 					Token::Query(Query::Numeric),
 					Token::LogicalOperator(LogicalOperator::Or),
@@ -527,7 +535,7 @@ mod tests {
 				]
 			),
 			starts_and_ends_with_multiple_whitespaces: (
-				"   numeric | alpha   ",
+				"   numeric or alpha   ",
 				vec![
 					Token::Query(Query::Numeric),
 					Token::LogicalOperator(LogicalOperator::Or),
@@ -535,7 +543,7 @@ mod tests {
 				]
 			),
 			has_multiple_whitespaces_between_query_and_operator: (
-				"numeric      |      alpha",
+				"numeric      or      alpha",
 				vec![
 					Token::Query(Query::Numeric),
 					Token::LogicalOperator(LogicalOperator::Or),
@@ -543,7 +551,7 @@ mod tests {
 				]
 			),
 			has_multiple_whitespaces_between_query_with_string_and_operator: (
-				"starts \"foo\"      |      alpha",
+				"starts \"foo\"      or      alpha",
 				vec![
 					Token::Query(Query::Starts("foo".to_string())),
 					Token::LogicalOperator(LogicalOperator::Or),
@@ -551,7 +559,7 @@ mod tests {
 				]
 			),
 			has_multiple_whitespaces_between_query_with_integer_and_operator: (
-				"length 999      |      alpha",
+				"length 999      or      alpha",
 				vec![
 					Token::Query(Query::Length(999)),
 					Token::LogicalOperator(LogicalOperator::Or),
