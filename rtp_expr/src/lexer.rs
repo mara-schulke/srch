@@ -473,4 +473,91 @@ mod tests {
 			),
 		}
 	}
+
+	mod it_ignores_multiple_or_trailing_whitespaces {
+		use super::*;
+
+		lexer_tests! {
+			begins_with_multiple_whitespaces: (
+				"    numeric | alpha",
+				vec![
+					Token::Query(Query::Numeric),
+					Token::LogicalOperator(Operator::Or),
+					Token::Query(Query::Alpha),
+				]
+			),
+			begins_with_multiple_whitespaces_and_query_with_string: (
+				"    starts \"foo\" | alpha",
+				vec![
+					Token::Query(Query::Starts("foo".to_string())),
+					Token::LogicalOperator(Operator::Or),
+					Token::Query(Query::Alpha),
+				]
+			),
+			begins_with_multiple_whitespaces_and_query_with_integer: (
+				"    length 0 | alpha",
+				vec![
+					Token::Query(Query::Length(0)),
+					Token::LogicalOperator(Operator::Or),
+					Token::Query(Query::Alpha),
+				]
+			),
+			ends_with_multiple_whitespaces: (
+				"numeric | alpha   ",
+				vec![
+					Token::Query(Query::Numeric),
+					Token::LogicalOperator(Operator::Or),
+					Token::Query(Query::Alpha),
+				]
+			),
+			ends_with_multiple_whitespacess_and_query_with_string: (
+				"numeric | starts \"foo\"   ",
+				vec![
+					Token::Query(Query::Numeric),
+					Token::LogicalOperator(Operator::Or),
+					Token::Query(Query::Starts("foo".to_string())),
+				]
+			),
+			ends_with_multiple_whitespacess_and_query_with_integer: (
+				"numeric | length 0   ",
+				vec![
+					Token::Query(Query::Numeric),
+					Token::LogicalOperator(Operator::Or),
+					Token::Query(Query::Length(0)),
+				]
+			),
+			starts_and_ends_with_multiple_whitespaces: (
+				"   numeric | alpha   ",
+				vec![
+					Token::Query(Query::Numeric),
+					Token::LogicalOperator(Operator::Or),
+					Token::Query(Query::Alpha),
+				]
+			),
+			has_multiple_whitespaces_between_query_and_operator: (
+				"numeric      |      alpha",
+				vec![
+					Token::Query(Query::Numeric),
+					Token::LogicalOperator(Operator::Or),
+					Token::Query(Query::Alpha),
+				]
+			),
+			has_multiple_whitespaces_between_query_with_string_and_operator: (
+				"starts \"foo\"      |      alpha",
+				vec![
+					Token::Query(Query::Starts("foo".to_string())),
+					Token::LogicalOperator(Operator::Or),
+					Token::Query(Query::Alpha),
+				]
+			),
+			has_multiple_whitespaces_between_query_with_integer_and_operator: (
+				"length 999      |      alpha",
+				vec![
+					Token::Query(Query::Length(999)),
+					Token::LogicalOperator(Operator::Or),
+					Token::Query(Query::Alpha),
+				]
+			),
+		}
+	}
 }
