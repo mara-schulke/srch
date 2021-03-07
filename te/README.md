@@ -1,4 +1,4 @@
-# The RTP Expression Language
+# The Text Expression Language
 
 This is a crate contains a parser, execution engine and specification for a super simple language to write readable and memorizable text processing expressions.
 

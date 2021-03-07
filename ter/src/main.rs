@@ -56,7 +56,7 @@ fn build_cli() -> App<'static> {
 				.default_value("line")
 				.possible_values(&["line", "word"]))
 			.arg(Arg::new("expression")
-				.about("The rtp expression used to determine matches")
+				.about("The text expression used to determine matches")
 				.takes_value(true)
 				.value_name("EXPRESSION")
 				.value_hint(ValueHint::Other)
@@ -112,7 +112,7 @@ fn main() -> io::Result<()> {
 		let expression = submatches.value_of("expression").unwrap_or_default();
 		let input = read_input_from_matches(&submatches)?;
 
-		let compiled_expr = match rtp_expr::into_ast(&expression.to_owned()) {
+		let compiled_expr = match te::into_ast(&expression.to_owned()) {
 			Ok(ast) => ast,
 			Err(_) => { panic!("Help the user at this point..") }
 		};
@@ -120,7 +120,7 @@ fn main() -> io::Result<()> {
 		let result = {
 			let iter = input.iter();
 			let filtered = iter.filter(|x| {
-				let is_match = rtp_expr::run(compiled_expr.clone(), &x.to_string());
+				let is_match = te::run(compiled_expr.clone(), &x.to_string());
 
 				if invert_matches {
 					return !is_match;

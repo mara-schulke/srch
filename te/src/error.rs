@@ -1,7 +1,7 @@
 use crate::{lexer, parser};
 
 
-pub type RTPExpressionResult<T> = std::result::Result<T, Error>;
+pub type TextExpressionResult<T> = std::result::Result<T, Error>;
 
 #[derive(Clone, Debug)]
 pub enum Error {
