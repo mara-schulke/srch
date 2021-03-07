@@ -27,12 +27,12 @@ impl Query {
 		}
 	}
 
-	pub fn exec(&self, tested_string: String) -> bool {
+	pub fn exec(&self, tested_string: &String) -> bool {
 		match self {
 			Self::Starts(arg) => tested_string.starts_with(arg),
 			Self::Ends(arg) => tested_string.ends_with(arg),
 			Self::Contains(arg) => tested_string.contains(arg),
-			Self::Equals(arg) => &tested_string == arg,
+			Self::Equals(arg) => &tested_string == &arg,
 			Self::Length(len) => tested_string.len() == *len as usize,
 			Self::Numeric => tested_string.chars().all(|c| c.is_ascii_digit()),
 			Self::Alpha => tested_string.chars().all(|c| c.is_ascii_alphabetic()),

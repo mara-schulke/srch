@@ -106,8 +106,6 @@ impl<I: Iterator<Item = char> + Clone> Lexer<I> {
 
 			match x {
 				Some(x) => {
-					println!("{:#?}", *x);
-
 					if x.is_ascii_whitespace() {
 						break;
 					}
@@ -202,7 +200,7 @@ impl<I: Iterator<Item = char> + Clone> Lexer<I> {
 	}
 }
 
-pub fn lex(expr: String) -> Result<Vec<Token>> {
+pub fn lex(expr: &String) -> Result<Vec<Token>> {
 	let mut lexer = Lexer::new(expr.chars());
 	let mut tokens: Vec<Token> = Vec::new();
 
@@ -226,7 +224,7 @@ mod tests {
 				#[test]
 				fn $name() {
 					let (input, expected) = $value;
-					pretty_assertions::assert_eq!(lex(input.to_string()).unwrap(), expected);
+					pretty_assertions::assert_eq!(lex(&input.to_string()).unwrap(), expected);
 				}
 			)*
 		}

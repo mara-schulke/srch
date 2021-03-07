@@ -10,7 +10,7 @@ use error::RTPExpressionResult;
 
 pub use runtime::run;
 
-pub fn into_ast(source: String) -> RTPExpressionResult<parser::AST> {
+pub fn into_ast(source: &String) -> RTPExpressionResult<parser::AST> {
 	let tokens = lexer::lex(source)?;
 	let ast = parser::parse(tokens)?;
 
