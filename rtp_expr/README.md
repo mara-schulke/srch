@@ -10,7 +10,7 @@ This Language holds only two data types; strings and integers. Both are used as 
 
 ### str
 
-A `str` must use double quotes. So `"foo"` and `"!"=$)(j0j0802"` are both valid strings. If a double quote occurs inside the string, it can be
+A `str` must use double quotes. So `"foo"` and `"!=$)(j0j0802"` are both valid strings. If a double quote occurs inside the string, it can be
 escaped using `\`. So strings with escaped double quotes look like this: `"\"Quoted Text\""`. This is actually all there is to strings. They cant contain
 any other escaped chars (such as new lines etc.)
 
