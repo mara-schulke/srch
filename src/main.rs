@@ -98,37 +98,44 @@ fn build_cli() -> App<'static> {
 fn main() -> io::Result<()> {
 	let matches = build_cli().get_matches();
 
+	fn run_filter_command(submatches: &ArgMatches, invert_matches: bool) -> Result<()> {
+		let expression = submatches.value_of("expression").unwrap_or_default();
+		let input = read_input_from_matches(&submatches)?;
+
+		let compiled_expr = match rtp_expr::into_ast(&expression.to_owned()) {
+			Ok(ast) => ast,
+			Err(_) => { panic!("Help the user at this point..") }
+		};
+
+		let result = {
+			let iter = input.iter();
+			let filtered = iter.filter(|x| {
+				let is_match = rtp_expr::run(compiled_expr.clone(), &x.to_string());
+
+				if invert_matches {
+					return !is_match;
+				}
+
+				is_match
+			});
+
+			filtered
+				.map(|s| &**s)
+				.collect::<Vec<&str>>()
+				.join("\n")
+		};
+
+		if !result.is_empty() {
+			println!("{}", result);
+		}
+
+		Ok(())
+	}
+
 	match matches.subcommand() {
-		Some(("filter", submatches)) => {
-			let expression = submatches.value_of("expression").unwrap_or_default();
-			let input = read_input_from_matches(&submatches)?;
-
-			let compiled_expr = match rtp_expr::into_ast(&expression.to_owned()) {
-				Ok(ast) => ast,
-				Err(_) => { panic!("Help the user at this point..") }
-			};
-
-			let result = {
-				let iter = input.iter();
-				let filtered = iter.filter(|x| rtp_expr::run(compiled_expr.clone(), &x.to_string()));
-//				filtered.collect::<Vec<&String>>()
-
-				filtered
-					.map(|s| &**s)
-					.collect::<Vec<&str>>()
-					.join("\n")
-			};
-
-			if !result.is_empty() {
-				println!("{}", result);
-			}
-		},
-		Some(("ignore", _submatches)) => {
-			println!("hello ignore me");
-		},
-		Some(("replace", _submatches)) => {
-			println!("hello replace me");
-		},
+		Some(("filter", submatches)) => run_filter_command(submatches, false)?,
+		Some(("ignore", submatches)) => run_filter_command(submatches, true)?,
+		Some(("replace", _submatches)) => unimplemented!(),
 		_ => {}
 	}
 
