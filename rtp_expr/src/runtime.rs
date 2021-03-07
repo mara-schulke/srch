@@ -14,19 +14,19 @@ impl Runtime {
 		}
 	}
 
-	pub fn run(&self, input: String) -> bool {
+	pub fn run(&self, input: &String) -> bool {
 		match &self.ast {
-			AST::Query(query) => query.exec(input.clone()),
+			AST::Query(query) => query.exec(input),
 			AST::BinaryExpression { left, operator, right } => match operator {
-				LogicalOperator::And => run((**left).clone(), input.clone()) && run((**right).clone(), input.clone()),
-				LogicalOperator::Or => run((**left).clone(), input.clone()) || run((**right).clone(), input.clone())
+				LogicalOperator::And => run((**left).clone(), input) && run((**right).clone(), input),
+				LogicalOperator::Or => run((**left).clone(), input) || run((**right).clone(), input)
 			}
 		}
 	}
 
 }
 
-pub fn run(ast: AST, input: String) -> bool {
+pub fn run(ast: AST, input: &String) -> bool {
 	let rt = Runtime::new(ast);
 
 	rt.run(input)
