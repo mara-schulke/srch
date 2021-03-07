@@ -1,6 +1,7 @@
-use std::io;
+use std::io::{self, Read, Result};
+use std::fs::File;
 
-use clap::{Arg, ArgGroup, App, ValueHint};
+use clap::{Arg, ArgGroup, ArgMatches, App, ValueHint};
 
 
 const NAME: &'static str = env!("CARGO_PKG_NAME");
@@ -8,6 +9,37 @@ const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 const AUTHOR: &'static str = env!("CARGO_PKG_AUTHORS");
 const DESCRIPTION: &'static str = env!("CARGO_PKG_DESCRIPTION");
 
+fn read_stdin() -> io::Result<String> {
+	let mut buffer = String::new();
+
+	io::stdin().read_to_string(&mut buffer)?;
+
+	Ok(buffer)
+}
+
+fn read_file(path: &str) -> Result<String> {
+	let mut file = File::open(path)?;
+	let mut contents = String::new();
+
+	file.read_to_string(&mut contents)?;
+
+	Ok(contents)
+}
+
+fn read_input_from_matches(matches: &ArgMatches) -> io::Result<Vec<String>> {
+	let input = match matches.value_of("input") {
+		Some(path) => read_file(path)?,
+		None => read_stdin()?
+	};
+
+	let items = match matches.value_of("mode") {
+		Some("line") => input.lines().map(|x| x.to_string()).collect(),
+		Some("word") => input.split_ascii_whitespace().map(|x| x.to_string()).collect(),
+		Some(_) | None => vec![]
+	};
+
+	Ok(items)
+}
 
 fn build_cli() -> App<'static> {
 	fn build_subcommand(name: &'static str, descr: &'static str) -> App<'static> {
@@ -67,13 +99,34 @@ fn main() -> io::Result<()> {
 	let matches = build_cli().get_matches();
 
 	match matches.subcommand() {
-		Some(("filter", _subm)) => {
-			println!("hello filter me");
+		Some(("filter", submatches)) => {
+			let expression = submatches.value_of("expression").unwrap_or_default();
+			let input = read_input_from_matches(&submatches)?;
+
+			let compiled_expr = match rtp_expr::into_ast(&expression.to_owned()) {
+				Ok(ast) => ast,
+				Err(_) => { panic!("Help the user at this point..") }
+			};
+
+			let result = {
+				let iter = input.iter();
+				let filtered = iter.filter(|x| rtp_expr::run(compiled_expr.clone(), &x.to_string()));
+//				filtered.collect::<Vec<&String>>()
+
+				filtered
+					.map(|s| &**s)
+					.collect::<Vec<&str>>()
+					.join("\n")
+			};
+
+			if !result.is_empty() {
+				println!("{}", result);
+			}
 		},
-		Some(("ignore", _subm)) => {
+		Some(("ignore", _submatches)) => {
 			println!("hello ignore me");
 		},
-		Some(("replace", _subm)) => {
+		Some(("replace", _submatches)) => {
 			println!("hello replace me");
 		},
 		_ => {}
