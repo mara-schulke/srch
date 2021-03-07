@@ -6,7 +6,6 @@ description = "A cli to run text expressions and perform basic text operations s
 edition = "2018"
 repository = "https://github.com/schulke-214/ter.git"
 license = "MIT"
-license-file = "../LICENSE"
 keywords = ["text-processing", "cli", ]
 categories = ["command-line-utilities"]
 readme = "../README.md"
