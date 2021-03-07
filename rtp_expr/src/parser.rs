@@ -148,7 +148,7 @@ mod tests {
 				#[test]
 				fn $name() {
 					let (tokens, expected_ast) = $value;
-					assert_eq!(parse(tokens).unwrap(), expected_ast);
+					pretty_assertions::assert_eq!(parse(tokens).unwrap(), expected_ast);
 				}
 			)*
 		}
@@ -308,6 +308,36 @@ mod tests {
 							operator: LogicalOperator::Or,
 							right: Box::new(ASTNode::Query(Query::Special))
 						}),
+					}),
+				}
+			),
+			numeric_or_alpha_and_alphanumeric_and_length_or_special: (
+				vec![
+					Token::Query(Query::Numeric),
+					Token::LogicalOperator(LogicalOperator::Or),
+					Token::Query(Query::Alpha),
+					Token::LogicalOperator(LogicalOperator::And),
+					Token::Query(Query::Alphanumeric),
+					Token::LogicalOperator(LogicalOperator::And),
+					Token::Query(Query::Length(100)),
+					Token::LogicalOperator(LogicalOperator::Or),
+					Token::Query(Query::Special),
+				],
+				AST::BinaryExpression {
+					left: Box::new(ASTNode::Query(Query::Numeric)),
+					operator: LogicalOperator::Or,
+					right: Box::new(ASTNode::BinaryExpression {
+						left: Box::new(ASTNode::BinaryExpression {
+							left: Box::new(ASTNode::Query(Query::Alpha)),
+							operator: LogicalOperator::And,
+							right: Box::new(ASTNode::BinaryExpression {
+								left: Box::new(ASTNode::Query(Query::Alphanumeric)),
+								operator: LogicalOperator::And,
+								right: Box::new(ASTNode::Query(Query::Length(100))),
+							})
+						}),
+						operator: LogicalOperator::Or,
+						right: Box::new(ASTNode::Query(Query::Special))
 					}),
 				}
 			),
