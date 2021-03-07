@@ -103,15 +103,7 @@ impl Parser {
 				cloned_tokens.remove(0);
 				cloned_tokens.remove(0);
 
-				if cloned_tokens.len() == 1 {
-					Box::new(
-						AST::Query(
-							Self::expect_query(cloned_tokens[0].clone())?
-						)
-					)
-				} else {
-					Box::new(parse(cloned_tokens)?)
-				}
+				Box::new(parse(cloned_tokens)?)
 			};
 
 			return Ok(ASTNode::BinaryExpression {
