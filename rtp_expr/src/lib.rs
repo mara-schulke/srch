@@ -1,7 +1,7 @@
 mod lexer;
-mod logical_operators;
+mod logical_operator;
 mod parser;
-mod queries;
+mod query;
 mod runtime;
 
 
