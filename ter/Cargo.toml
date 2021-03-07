@@ -1,0 +1,10 @@
+[package]
+name = "ter"
+version = "0.1.0"
+authors = ["Maximilian Schulke <hello@maximilianschulke.com>"]
+description = "A small & well tested tool and language to easily execute basic text operations such as filtering, ignoring or replacing words or lines"
+edition = "2018"
+
+[dependencies]
+te = "0.1.0"
+clap = "3.0.0-beta.2"

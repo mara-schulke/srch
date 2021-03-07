@@ -5,12 +5,12 @@ mod parser;
 mod query;
 mod runtime;
 
-use error::RTPExpressionResult;
+use error::TextExpressionResult;
 
 
 pub use runtime::run;
 
-pub fn into_ast(source: &String) -> RTPExpressionResult<parser::AST> {
+pub fn into_ast(source: &String) -> TextExpressionResult<parser::AST> {
 	let tokens = lexer::lex(source)?;
 	let ast = parser::parse(tokens)?;
 

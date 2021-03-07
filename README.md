@@ -1,41 +1,41 @@
-# rtp - Readable Text Proccessor
+# ter - Readable Text Proccessor
 
-`rtp` is a small, well tested cli (and language), to easily execute basic text operations
+`ter` is a small, well tested cli (and language), to easily execute basic text operations
 (filtering, ignore, replace) on the command line. There are many great tools that do this job.
 But most other tools have one in common: They are hard to memorize if you dont use them regularly.
-`rtp` tries to solve this issue by providing a super simple cli & expression language which can
+`ter` tries to solve this issue by providing a super simple cli & expression language which can
 be easily memorized and is well documented.
 
 ## Quickstart
 
 ```
-$ rtp filter 'equals "foobar"' -m word				# matches all occurences `foobar` in the text
-$ rtp filter 'length 20'							# matches all lines with 20 chars
-$ rtp ignore 'numeric or special'					# ignores all lines which contain only numbers and special chars
-$ rtp replace 'numeric and length 5' 12345 -m word	# replaces all 5 digit numbers with `12345`
+$ ter filter 'equals "foobar"' -m word				# matches all occurences `foobar` in the text
+$ ter filter 'length 20'							# matches all lines with 20 chars
+$ ter ignore 'numeric or special'					# ignores all lines which contain only numbers and special chars
+$ ter replace 'numeric and length 5' 12345 -m word	# replaces all 5 digit numbers with `12345`
 ```
 
-## Common tasks where `rtp` excels `grep` in readability
+## Common tasks where `ter` excels `grep` in readability
 
-| Task                                                    | `rtp`                                                                   | `grep`                                                                                         |
+| Task                                                    | `ter`                                                                   | `grep`                                                                                         |
 |---------------------------------------------------------|-------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
-| Find all words containing a string                      | `rtp filter 'contains "substr"' -m word`                                | `grep -oh "\w*substr\w*"`                                                                      |
-| Find all lines in a file with a specific length         | `rtp filter 'length 10'`                                                | `grep -x '.\{10\}'`                                                                            |                        |                              | `grep -oh "\w*substr\w*"` |
-| Ignore all lines containing a string                    | `rtp ignore 'contains "hide me"'`                                       | `grep -v "hide me"`                                                                            |
-| Replacing all words following a specific pattern        | `rtp replace 'numeric and length 5' 12345 -m word`                      | `grep` itself cant replace, you need to use `sed` for that (which gets even more complicated). |
-| Replacing all email addresses in a file with your email | `rtp replace 'contains "@" and contains ".com"' your@email.com -m word` | Same as above.                                                                                 |
+| Find all words containing a string                      | `ter filter 'contains "substr"' -m word`                                | `grep -oh "\w*substr\w*"`                                                                      |
+| Find all lines in a file with a specific length         | `ter filter 'length 10'`                                                | `grep -x '.\{10\}'`                                                                            |                        |                              | `grep -oh "\w*substr\w*"` |
+| Ignore all lines containing a string                    | `ter ignore 'contains "hide me"'`                                       | `grep -v "hide me"`                                                                            |
+| Replacing all words following a specific pattern        | `ter replace 'numeric and length 5' 12345 -m word`                      | `grep` itself cant replace, you need to use `sed` for that (which gets even more complicated). |
+| Replacing all email addresses in a file with your email | `ter replace 'contains "@" and contains ".com"' your@email.com -m word` | Same as above.                                                                                 |
 
 
 ## When to use other tools
 
-As said earlier: `rtp` is no direct competitor to `grep`, `awk`, etc.! If you find yourself reaching the limits of the rtp expression language, you probably want to use more advanced tools. `rtp` 
+As said earlier: `ter` is no direct competitor to `grep`, `awk`, etc.! If you find yourself reaching the limits of the text expression language, you probably want to use more advanced tools.
 
 # Installing
 
-At the moment `rtp` can be installed only via `cargo` using:
+At the moment `ter` can be installed only via `cargo` using:
 
 ```
-$ cargo install rtp
+$ cargo install ter
 ```
 
 # Documentation
@@ -52,24 +52,24 @@ And there are the following global flags:
 - `--limit n`, show at most n matches
 
 ```
-rtp filter [FLAGS] [OPTIONS] <EXPRESSION> [FILE]
-rtp ignore [FLAGS] [OPTIONS] <EXPRESSION> [FILE]
-rtp replace [FLAGS] [OPTIONS] <EXPRESSION> <REPLACEMENT> [FILE]
+ter filter [FLAGS] [OPTIONS] <EXPRESSION> [FILE]
+ter ignore [FLAGS] [OPTIONS] <EXPRESSION> [FILE]
+ter replace [FLAGS] [OPTIONS] <EXPRESSION> <REPLACEMENT> [FILE]
 ```
 
-If no file is provided `rtp` tries to read from stdin.
+If no file is provided `ter` tries to read from stdin.
 
 ## Examples
 
 ```
-$ docker ps | rtp filter 'alphanumeric and length 12' -m word # prints all docker container ids
+$ docker ps | ter filter 'alphanumeric and length 12' -m word # prints all docker container ids
 ```
 
-# The RTP Expression Language
+# The ter Expression Language
 
 This is a super simple format of writing readable and easy to memorize text processing expressions - there are many great and far more advanced languages and tools to process text on the commandline out there but all of them have one problem in common - they're unreadable and hard to memorize if not used often.
 
-The RTP Expression Languages provides only 9 Attributes to query by. These attributes indicate the format of a string which gets tested against it.
+The ter Expression Languages provides only 9 Attributes to query by. These attributes indicate the format of a string which gets tested against it.
 
 | Attribute        | Resolve to true if the tested string           |
 |------------------|------------------------------------------------|
