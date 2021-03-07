@@ -1,5 +1,5 @@
-#[derive(Clone, Debug, PartialEq)]
-pub enum Operator {
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum LogicalOperator {
 	And,
 	Or
 }
