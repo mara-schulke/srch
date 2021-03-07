@@ -8,7 +8,7 @@ homepage = "https://github.com/schulke-214/ter/tree/main/te"
 repository = "https://github.com/schulke-214/ter.git"
 license = "MIT"
 readme = "README.md"
-keywords = ["text-processing", "language", "domain-specific-language"]
+keywords = ["text-processing", "language", "dsl"]
 
 [dependencies]
 
