@@ -53,7 +53,7 @@ mod tests {
 		use pretty_assertions::assert_eq;
 
 		#[test]
-		fn starts_correctly() {
+		fn correct() {
 			assert_eq!(
 				Query::Starts("foo".to_string()).exec("foobar".to_string()),
 				true
@@ -61,7 +61,7 @@ mod tests {
 		}
 
 		#[test]
-		fn starts_correctly_but_with_space() {
+		fn correct_but_with_space() {
 			assert_eq!(
 				Query::Starts("foo".to_string()).exec(" foobar".to_string()),
 				false
@@ -69,7 +69,7 @@ mod tests {
 		}
 
 		#[test]
-		fn starts_incorrect() {
+		fn incorrect() {
 			assert_eq!(
 				Query::Starts("foo".to_string()).exec("barfoo".to_string()),
 				false
@@ -82,7 +82,7 @@ mod tests {
 		use pretty_assertions::assert_eq;
 
 		#[test]
-		fn correctly() {
+		fn correct() {
 			assert_eq!(
 				Query::Ends("baz".to_string()).exec("foobaz".to_string()),
 				true
@@ -90,7 +90,7 @@ mod tests {
 		}
 
 		#[test]
-		fn correctly_but_with_space() {
+		fn correct_but_with_space() {
 			assert_eq!(
 				Query::Ends("baz".to_string()).exec("baz ".to_string()),
 				false
@@ -173,4 +173,169 @@ mod tests {
 			);
 		}
 	}
+
+	mod equals {
+		use super::*;
+		use pretty_assertions::assert_eq;
+
+		#[test]
+		fn correct() {
+			assert_eq!(
+				Query::Equals("foo".to_string()).exec("foo".to_string()),
+				true
+			);
+		}
+
+		#[test]
+		fn correct_but_with_space() {
+			assert_eq!(
+				Query::Equals("foo".to_string()).exec(" foo".to_string()),
+				false
+			);
+		}
+
+		#[test]
+		fn close_to_correct() {
+			assert_eq!(
+				Query::Equals("foo".to_string()).exec("fooo".to_string()),
+				false
+			);
+		}
+
+		#[test]
+		fn incorrect() {
+			assert_eq!(
+				Query::Equals("foo".to_string()).exec("bar".to_string()),
+				false
+			);
+		}
+	}
+
+	mod length {
+		use super::*;
+		use pretty_assertions::assert_eq;
+
+		#[test]
+		fn correct() {
+			assert_eq!(
+				Query::Length(3).exec("foo".to_string()),
+				true
+			);
+		}
+
+		#[test]
+		fn one_char_to_short() {
+			assert_eq!(
+				Query::Length(3).exec("fo".to_string()),
+				false
+			);
+		}
+
+		#[test]
+		fn one_char_to_long() {
+			assert_eq!(
+				Query::Length(3).exec("fooo".to_string()),
+				false
+			);
+		}
+
+		#[test]
+		fn completly_wrong_length() {
+			assert_eq!(
+				Query::Length(3).exec("foobarbaz".to_string()),
+				false
+			);
+		}
+	}
+
+	mod numeric {
+		use super::*;
+		use pretty_assertions::assert_eq;
+
+		#[test]
+		fn only_digits() {
+			assert_eq!(
+				Query::Numeric.exec("123456789".to_string()),
+				true
+			);
+		}
+
+		#[test]
+		fn digits_and_spaces() {
+			assert_eq!(
+				Query::Numeric.exec("123 213124 2".to_string()),
+				false
+			);
+		}
+
+		#[test]
+		fn digits_and_alpha() {
+			assert_eq!(
+				Query::Numeric.exec("123e".to_string()),
+				false
+			);
+		}
+
+		#[test]
+		fn digits_and_punctuation() {
+			assert_eq!(
+				Query::Numeric.exec("123.2".to_string()),
+				false
+			);
+		}
+
+		#[test]
+		fn empty() {
+			assert_eq!(
+				Query::Numeric.exec("".to_string()),
+				true
+			);
+		}
+	}
+
+	mod alpha {
+		use super::*;
+		use pretty_assertions::assert_eq;
+
+		#[test]
+		fn only_alpha() {
+			assert_eq!(
+				Query::Alpha.exec("abc".to_string()),
+				true
+			);
+		}
+
+		#[test]
+		fn alpha_and_spaces() {
+			assert_eq!(
+				Query::Alpha.exec("abc def ghij k".to_string()),
+				false
+			);
+		}
+
+		#[test]
+		fn alpha_and_digits() {
+			assert_eq!(
+				Query::Alpha.exec("ABC1".to_string()),
+				false
+			);
+		}
+
+		#[test]
+		fn alpha_and_punctuation() {
+			assert_eq!(
+				Query::Alpha.exec("abc.com".to_string()),
+				false
+			);
+		}
+
+		#[test]
+		fn empty() {
+			assert_eq!(
+				Query::Alpha.exec("".to_string()),
+				true
+			);
+		}
+	}
+
 }
