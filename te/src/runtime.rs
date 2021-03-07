@@ -46,7 +46,7 @@ mod tests {
 				#[test]
 				fn $name() {
 					let (query_source, test_string, result) = $value;
-					pretty_assertions::assert_eq!(run(into_ast(query_source.to_string()).unwrap(), test_string.to_string()), result);
+					pretty_assertions::assert_eq!(run(into_ast(&query_source.to_string()).unwrap(), &test_string.to_string()), result);
 				}
 			)*
 		}
