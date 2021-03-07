@@ -57,37 +57,37 @@ mod tests {
 
 		runtime_test! {
 			numeric_and_length: (
-				"numeric & length 9",
+				"numeric and length 9",
 				"123456789",
 				true
 			),
 			numeric_and_length_with_alphanumeric_input: (
-				"numeric & length 9",
+				"numeric and length 9",
 				"123456ABC",
 				false
 			),
 			numeric_and_alpha: (
-				"numeric & alpha",
+				"numeric and alpha",
 				"123456789",
 				false
 			),
 			numeric_and_alpha_with_alphanumeric_input: (
-				"numeric & numeric",
+				"numeric and numeric",
 				"123ABC",
 				false
 			),
 			numeric_and_alphanumeric_with_numeric_input: (
-				"numeric & alphanumeric",
+				"numeric and alphanumeric",
 				"123456789",
 				true
 			),
 			numeric_and_alphanumeric_with_alphanumeric_input: (
-				"numeric & alphanumeric",
+				"numeric and alphanumeric",
 				"123ABC",
 				false
 			),
 			numeric_and_special: (
-				"numeric & special",
+				"numeric and special",
 				"123",
 				false
 			),
@@ -99,37 +99,37 @@ mod tests {
 
 		runtime_test! {
 			numeric_or_length: (
-				"numeric | length 9",
+				"numeric or length 9",
 				"123456789",
 				true
 			),
 			numeric_or_wrong_length: (
-				"numeric | length 99",
+				"numeric or length 99",
 				"123456789",
 				true
 			),
 			numeric_or_alpha: (
-				"numeric | alpha",
+				"numeric or alpha",
 				"123456789",
 				true
 			),
 			numeric_or_alpha_with_alphanumeric_input: (
-				"numeric | alpha",
+				"numeric or alpha",
 				"123ABC",
 				false
 			),
 			numeric_or_alphanumeric_with_numeric_input: (
-				"numeric | alphanumeric",
+				"numeric or alphanumeric",
 				"123456789",
 				true
 			),
 			numeric_or_alphanumeric_with_alphanumeric_input: (
-				"numeric | alphanumeric",
+				"numeric or alphanumeric",
 				"123ABC",
 				true
 			),
 			numeric_or_special: (
-				"numeric | special",
+				"numeric or special",
 				"123456789",
 				true
 			),
@@ -141,67 +141,67 @@ mod tests {
 
 		runtime_test! {
 			starts_and_ends_or_length_with_correct_length: (
-				"starts \"foo\" & ends \"bar\" | length 9",
+				"starts \"foo\" and ends \"bar\" or length 9",
 				"xyzxyzxyz",
 				true
 			),
 			starts_and_ends_or_length_with_correct_start_wrong_end: (
-				"starts \"foo\" & ends \"bar\" | length 9",
+				"starts \"foo\" and ends \"bar\" or length 9",
 				"foobaz",
 				false
 			),
 			starts_and_ends_or_length_with_correct_start_and_end: (
-				"starts \"foo\" & ends \"bar\" | length 9",
+				"starts \"foo\" and ends \"bar\" or length 9",
 				"foobar",
 				true
 			),
 			starts_and_ends_or_length_with_correct_start_and_end_and_length: (
-				"starts \"foo\" & ends \"bar\" | length 9",
+				"starts \"foo\" and ends \"bar\" or length 9",
 				"foobazbar",
 				true
 			),
 			starts_and_ends_or_length_with_correct_start_and_end_and_wrong_length: (
-				"starts \"foo\" & ends \"bar\" | length 9",
+				"starts \"foo\" and ends \"bar\" or length 9",
 				"foobaaaaaaaaazbar",
 				true
 			),
 			starts_and_ends_or_equals_or_length_with_completly_wrong_input: (
-				"starts \"foo\" & ends \"bar\" | equals \"keyword\" | length 4",
+				"starts \"foo\" and ends \"bar\" or equals \"keyword\" or length 4",
 				"completly wrong input :)",
 				false
 			),
 			starts_and_ends_or_equals_or_length_with_correct_start_wrong_end: (
-				"starts \"foo\" & ends \"bar\" | equals \"keyword\" | length 4",
+				"starts \"foo\" and ends \"bar\" or equals \"keyword\" or length 4",
 				"foo but wrong end",
 				false
 			),
 			starts_and_ends_or_equals_or_length_with_wrong_start_correct_end: (
-				"starts \"foo\" & ends \"bar\" | equals \"keyword\" | length 4",
+				"starts \"foo\" and ends \"bar\" or equals \"keyword\" or length 4",
 				"wrong start but bar",
 				false
 			),
 			starts_and_ends_or_equals_or_length_with_correct_start_correct_end: (
-				"starts \"foo\" & ends \"bar\" | equals \"keyword\" | length 4",
+				"starts \"foo\" and ends \"bar\" or equals \"keyword\" or length 4",
 				"foo weird middle part bar",
 				true
 			),
 			starts_and_ends_or_equals_or_length_with_equals: (
-				"starts \"foo\" & ends \"bar\" | equals \"keyword\" | length 4",
+				"starts \"foo\" and ends \"bar\" or equals \"keyword\" or length 4",
 				"keyword",
 				true
 			),
 			starts_and_ends_or_equals_or_length_with_slightly_wrong_equals: (
-				"starts \"foo\" & ends \"bar\" | equals \"keyword\" | length 4",
+				"starts \"foo\" and ends \"bar\" or equals \"keyword\" or length 4",
 				"keywords",
 				false
 			),
 			starts_and_ends_or_equals_or_length_with_wrong_length: (
-				"starts \"foo\" & ends \"bar\" | equals \"keyword\" | length 4",
+				"starts \"foo\" and ends \"bar\" or equals \"keyword\" or length 4",
 				"UWXYZ",
 				false
 			),
 			starts_and_ends_or_equals_or_length_with_correct_length: (
-				"starts \"foo\" & ends \"bar\" | equals \"keyword\" | length 4",
+				"starts \"foo\" and ends \"bar\" or equals \"keyword\" or length 4",
 				"WXYZ",
 				true
 			),
