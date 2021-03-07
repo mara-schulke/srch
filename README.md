@@ -11,11 +11,11 @@ be easily memorized and is well documented.
 ```
 rtp [operation] [mode] '<rtp-expression>' [flags] input output
 
-rtp filter 'starts FOO or contains BLA' --json ./.env
-rtp filter word 
+rtp filter 'starts "FOO" or contains "BLA"' --json ./.env
+rtp filter word 'equals "keyword"'
 
 rtp ignore word 'length 17'
-rtp replace foo baz ./.env
+rtp replace 'equals "foo"' baz ./.env
 ```
 
 ## Common tasks where `rtp` excels `grep` in readability
