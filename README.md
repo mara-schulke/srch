@@ -65,11 +65,11 @@ If no file is provided `ter` tries to read from stdin.
 $ docker ps | ter filter 'alphanumeric and length 12' -m word # prints all docker container ids
 ```
 
-# The ter Expression Language
+# The Text Expression Language
 
 This is a super simple format of writing readable and easy to memorize text processing expressions - there are many great and far more advanced languages and tools to process text on the commandline out there but all of them have one problem in common - they're unreadable and hard to memorize if not used often.
 
-The ter Expression Languages provides only 9 Attributes to query by. These attributes indicate the format of a string which gets tested against it.
+The Text Expression Languages provides only 9 Attributes to query by. These attributes indicate the format of a string which gets tested against it.
 
 | Attribute        | Resolve to true if the tested string           |
 |------------------|------------------------------------------------|
