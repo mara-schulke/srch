@@ -8,7 +8,7 @@ repository = "https://github.com/schulke-214/ter.git"
 license = "MIT"
 keywords = ["text-processing", "cli" ]
 categories = ["command-line-utilities"]
-readme = "../README.md"
+readme = "README.md"
 
 [dependencies]
 te = "0.1.0"
