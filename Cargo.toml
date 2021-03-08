@@ -1,0 +1,15 @@
+[package]
+name = "ter"
+version = "0.1.0"
+authors = ["Maximilian Schulke <hello@maximilianschulke.com>"]
+description = "A cli to run text expressions and perform basic text operations such as filtering, ignoring and replacing"
+edition = "2018"
+repository = "https://github.com/schulke-214/ter.git"
+license = "MIT"
+keywords = ["text-processing", "cli" ]
+categories = ["command-line-utilities"]
+readme = "../README.md"
+
+[dependencies]
+te = "0.1.0"
+clap = "3.0.0-beta.2"
