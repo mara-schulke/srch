@@ -1,6 +1,6 @@
 [package]
 name = "ter"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Maximilian Schulke <hello@maximilianschulke.com>"]
 description = "A cli to run text expressions and perform basic text operations such as filtering, ignoring and replacing"
 edition = "2018"
