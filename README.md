@@ -8,6 +8,8 @@ is well documented.
 
 ## Quickstart
 
+<img src="https://raw.githubusercontent.com/schulke-214/ter/main/preview.gif" style="width: 100%;" />
+
 ```
 $ ter filter 'equals "foobar"' -m word				# matches all occurences `foobar` in the text
 $ ter filter 'length 20'							# matches all lines with 20 chars
