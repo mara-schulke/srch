@@ -122,7 +122,7 @@ fn main() -> io::Result<()> {
 			let filtered = iter.filter(|x| {
 				let is_match = te::run(compiled_expr.clone(), &x.to_string());
 
-				match invert_matches{
+				match invert_matches {
 					true => !is_match,
 					false => is_match,
 				}
