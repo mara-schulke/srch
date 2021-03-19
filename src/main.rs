@@ -1,3 +1,56 @@
+//! This crate contains a cli tool named `ter` (**T**ext **E**xpression **R**unner)
+//! to process text on the command line using text expressions. Typical
+//! tasks are filtering, ignoring or replacing words or lines from input.
+//! The input can be either provided via stdin or be read from an input
+//! file.
+//! 
+//! # Usage
+//! 
+//! `ter` is splitted into subcommands to make it as maintainable and
+//! readable as possible. At the moment there are the following subcommands:
+//! `filter`, `ignore`, `replace`
+//! 
+//! ## Modes
+//! Before we can really dive in we need to take a quick look at the
+//! available operation modes. Currently implemented are the two modes
+//! `line` and `word`. As you might guess `line` is the default operation
+//! mode for all commands. So everytime we execute a command which doesn't
+//! specify another operation mode (namely `word`) the provided text
+//! expression is executed on each line of the input, and each matched line
+//! will be printed out.
+//! 
+//! So to keep this short, here are two example which should clarify the modes
+//! 
+//! ```bash
+//! $ cat foo.txt
+//! foo bar
+//! foo baz
+//! bar foo
+//! bar baz
+//! $ ter filter 'start "foo"' foo.txt
+//! foo bar
+//! foo baz
+//! $ ter filter 'start "foo"' -m word foo.txt
+//! foo
+//! foo
+//! foo
+//! ```
+//! 
+//! ## Filtering or Ignoring
+//! The commands `filter` and `ignore` work exactly the same. The only
+//! difference is the inverted output is printed if `ignore` is used.
+//! 
+//! `filter` prints (depending on the mode) all lines or words matching
+//! a specifc format described by the provided text expression. `ignore`
+//! just prints everything except these matches.
+//! 
+//! So the basic synopsis for these commands looks like this:
+//! 
+//! ```bash
+//! $ ter filter <EXPRESSION> [FILE]
+//! $ ter ignore <EXPRESSION> [FILE]
+//! ```
+
 use std::io::{self, Read, Result};
 use std::fs::File;
 
@@ -114,7 +167,12 @@ fn main() -> io::Result<()> {
 
 		let compiled_expr = match te::into_ast(&expression.to_owned()) {
 			Ok(ast) => ast,
-			Err(_) => { panic!("Help the user at this point..") }
+			Err(_) => {
+				println!("Seems like you've provided an invalid text expression!");
+				println!("Please head over to the text expression documentation:");
+				println!("\nhttps://docs.rs/te/");
+				return std::process::exit(1);
+			}
 		};
 
 		let result = {
