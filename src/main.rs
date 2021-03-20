@@ -94,6 +94,8 @@ fn read_input_from_matches(matches: &ArgMatches) -> io::Result<Vec<String>> {
 	Ok(items)
 }
 
+// TODO: Add a "split" command to split text at certain chars
+
 fn build_cli() -> App<'static> {
 	fn build_subcommand(name: &'static str, descr: &'static str) -> App<'static> {
 		App::new(name)
