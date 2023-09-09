@@ -1,10 +1,10 @@
 [package]
 name = "srch"
-version = "0.1.1"
+version = "0.0.1"
 authors = ["Mara Schulke <mara@schulke.xyz>"]
 description = "Text Search For Humans"
 edition = "2018"
-repository = "https://github.com/mara-schulke/ter.git"
+repository = "https://github.com/mara-schulke/srch.git"
 license = "MIT"
 keywords = ["text-processing", "cli" ]
 categories = ["command-line-utilities"]
