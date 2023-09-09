@@ -22,7 +22,7 @@ memorized and is well documented.
 ```
 $ srch for 'equals "foobar"' -m word                # matches all occurences `foobar` in the text
 $ srch for 'length 20'                              # matches all lines with 20 chars
-$ srch ignore 'numeric or special'                  # ignores all lines which contain only numbers and special chars
+$ srch not 'numeric or special'                     # ignores all lines which contain only numbers and special chars
 $ srch replace 'numeric and length 5' 12345 -m word # replaces all 5 digit numbers with `12345`
 ```
 
