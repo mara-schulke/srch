@@ -1,5 +1,5 @@
 [package]
-name = "te"
+name = "sel"
 version = "0.1.0"
 description = "A really simple, stripped down & readable regular expression alternative for matching text"
 authors = ["Mara Schulke <mara@schulke.xyz>"]

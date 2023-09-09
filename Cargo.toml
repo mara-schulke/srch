@@ -1,8 +1,8 @@
 [package]
-name = "ter"
+name = "srch"
 version = "0.1.1"
 authors = ["Mara Schulke <mara@schulke.xyz>"]
-description = "A cli to run text expressions and perform basic text operations such as filtering, ignoring and replacing"
+description = "Text Search For Humans"
 edition = "2018"
 repository = "https://github.com/mara-schulke/ter.git"
 license = "MIT"
@@ -11,5 +11,5 @@ categories = ["command-line-utilities"]
 readme = "README.md"
 
 [dependencies]
-te = "0.1.0"
-clap = "3.0.0-beta.2"
+sel = { path = "./sel" }
+clap = "3.0.0"
