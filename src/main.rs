@@ -185,7 +185,7 @@ fn main() -> io::Result<()> {
         let expression = submatches.value_of("expression").unwrap_or_default();
         let input = read_input_from_matches(&submatches)?;
 
-        let matcher = match sel::Matcher::new(&expression.to_owned()) {
+        let expr = match srch::Expression::new(&expression.to_owned()) {
             Ok(ast) => ast,
             Err(_) => {
                 println!("Seems like you've provided an invalid text expression!");
@@ -198,7 +198,7 @@ fn main() -> io::Result<()> {
         let result = {
             let iter = input.iter();
             let filtered = iter.filter(|x| {
-                let is_match = matcher.is_match(&x.to_string());
+                let is_match = expr.matches(&x.to_string());
 
                 match invert_matches {
                     true => !is_match,
