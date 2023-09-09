@@ -118,8 +118,3 @@ numeric and length 8
 This Syntax might not cover all use cases. It's not meant to do that. If you
 find yourself reaching the limits of this language you might want to use more
 advanced tools (such as awk, grep, sed..)
-
----
-
-The code for the language itself lives in a seperate
-[repository](https://github.com/schulke-214/te).

@@ -1,0 +1,20 @@
+[package]
+name = "te"
+version = "0.1.0"
+description = "A really simple, stripped down & readable regular expression alternative for matching text"
+authors = ["Mara Schulke <mara@schulke.xyz>"]
+edition = "2018"
+homepage = "https://github.com/mara-schulke/te"
+repository = "https://github.com/mara-schulke/te.git"
+license = "MIT"
+readme = "README.md"
+keywords = ["text-processing", "language", "dsl"]
+
+[features]
+lazy = ["lazy_static"]
+
+[dependencies]
+lazy_static = { version = "1.4.0", optional = true }
+
+[dev-dependencies]
+pretty_assertions = "0.6.1"
